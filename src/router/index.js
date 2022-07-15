@@ -30,6 +30,11 @@ const routes = [
     component: () => import('@/views/Verify.vue')
   },
   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: () => import('@/views/ForgotPassword.vue')
+  },
+  {
     path: '/dashboard',
     name: 'Dashboard',
     meta: {
