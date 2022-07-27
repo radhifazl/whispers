@@ -35,13 +35,18 @@ const routes = [
     component: () => import('@/views/ForgotPassword.vue')
   },
   {
-    path: '/dashboard',
-    name: 'Dashboard',
+    path: '/home',
+    name: 'HomeProfile',
     meta: {
       requiresAuth: true,
       requiresVerified: true
     },
-    component: () => import('@/views/Dash.vue')
+    component: () => import('@/views/HomeProfile.vue')
+  },
+  {
+    path: '/:id',
+    name: 'MessagesPage',
+    component: () => import('@/views/MessagesPage.vue')
   },
 ]
 
@@ -65,7 +70,7 @@ router.beforeEach(async (to, from, next) => {
   
   if(to.path === '/login' || to.path === '/register') {
     if(await getCurrentUser()) {
-      next('/dashboard')
+      next('/home')
       return
     }
   } 

@@ -6,6 +6,9 @@
     --text-color-hover: #555555;
     --bg-color: linear-gradient(90deg, rgba(212,212,212,1) 0%, rgba(157,152,152,1) 100%);
     --primary-color: #4B4949;
+    --nav-glassbg: rgba(255, 255, 255, 0.35);
+    --nav-glassborder: 1px solid rgba( 255, 255, 255, 0.18 );
+    --nav-glassboxshadow: 0 8px 32px 0 rgba( 31, 38, 135, 0.37 );
     --darker-primary-color: #353535;
     --instagram-color: #F51963;
     --twitter-color: #1DA1F2;
@@ -36,6 +39,22 @@
     border-radius: 3px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+}
+
+.sbtn {
+    border: none;
+    outline: none;
+    padding: 0.3rem 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    background: var(--primary-color);
+    color: #FFF;
+    font-size: 0.838rem;
+    transition: 0.3s ease;
+}
+
+.sbtn:hover {
+    background-color: var(--darker-primary-color);
 }
 
 .form-container {

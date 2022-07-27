@@ -11,7 +11,7 @@
                   <input type="text" name="name" 
                     id="name" 
                     class="name-inp inp mb-3" 
-                    autocomplete="off"
+                    autocomplete="off" minlength="3" maxlength="20"
                     placeholder="Type your name here" v-model="name"
                   >
               </div>
@@ -59,15 +59,9 @@
 import SubmitButton from '@/components/Buttons/SubmitButton.vue';
 import OrSeparator from '@/components/OrSeparator.vue';
 import GoogleSignIn from '@/components/Buttons/GoogleSignIn.vue';
-import { onMounted, ref, watch } from "vue";
-import router from '@/router';
-import { auth } from "@/firebase";
-import { 
-    createUserWithEmailAndPassword, updateProfile,
-    signOut, onAuthStateChanged, signInWithPopup, GoogleAuthProvider 
-} from "firebase/auth";
-import { Toast } from "@/components/Toast";
+import { ref } from "vue";
 import Swal from 'sweetalert2';
+import { useStore } from 'vuex';
 
 export default {
     components: { SubmitButton, OrSeparator, GoogleSignIn },
@@ -87,6 +81,7 @@ export default {
         },
     },
     setup () {
+      const store = useStore()
       const name = ref(''),
             email = ref(''),
             password = ref(''),
@@ -94,8 +89,10 @@ export default {
 
       const register = async () => {
         if(!name.value || !email.value || !password.value) {
+
             Swal.fire({
                 icon: 'error',
+                iconColor: '#4B4949',
                 title: 'There is empty field',
                 color: '#1E1E1E',
                 text: 'You need to fill all fields to register an account',
@@ -107,77 +104,16 @@ export default {
             })
         } else {
             isRegistering.value = true;
-            await createUserWithEmailAndPassword(auth, email.value, password.value)
-                .then(() => {
-                    router.push('/verify')
-                }).catch(err => {
-                    switch(err.code) {
-                        case 'auth/email-already-in-use':
-                            alert('Email already in use');
-                            break;
-                        case 'auth/invalid-email':
-                            alert('Invalid email');
-                            break;
-                        case 'auth/weak-password':
-                            alert('Weak password');
-                            break;
-                        default:
-                            alert('Unknown error');
-                            break;
-                    }
-                }).finally(() => {
-                    isRegistering.value = false;
-                });
-                
-            await updateProfile(auth.currentUser, {
-                displayName: name.value
-            })
+            await store.dispatch('register', { name: name.value, email: email.value, password: password.value })
+            isRegistering.value = false;
+            name.value = '';
+            email.value = '';
+            password.value = '';
         }
       }
 
       const googleSignIn = async () => {
-          const provider = new GoogleAuthProvider()
-          await signInWithPopup(auth, provider)
-            .then(() => {
-                router.push('/dashboard')
-                Toast.fire({
-                    icon: 'success',
-                    title: 'Welcome to Whispers',
-                    text: 'You are now logged in',
-                })
-            }).catch(error => {
-                switch(error.code) {
-                case 'auth/account-exists-with-different-credential':
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'Email already in use with different credential',
-                    })
-                    break
-                case 'auth/cancelled-popup-request':
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'The popup has been closed',
-                    })
-                    break
-                case 'auth/popup-blocked':
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'The popup was blocked by the browser',
-                    })
-                    break
-                case 'auth/popup-closed-by-user':
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'The popup window was closed',
-                    })
-                    break
-                default:
-                    Toast.fire({
-                        icon: 'error',
-                        title: 'An undefined error occurred.',
-                    })
-                }
-            })
+          await store.dispatch('googleLogin')
       }
 
       return {

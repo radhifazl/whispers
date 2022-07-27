@@ -28,7 +28,7 @@ export default {
         auth.languageCode = 'en'
 
         let actionCodeSettings = {
-            url: 'http://localhost:8080/dashboard',
+            url: 'http://localhost:8080/home',
             handleCodeInApp: false
         }
 

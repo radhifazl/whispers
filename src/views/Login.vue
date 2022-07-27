@@ -11,7 +11,6 @@
                   <input type="email" name="email" 
                     id="email" 
                     class="email-inp inp mb-3" 
-                    autocomplete="off"
                     placeholder="Type your email here" v-model="email"
                   >
               </div>
@@ -34,7 +33,7 @@
           <div class="form bottom-form">
             <OrSeparator/>
             <GoogleSignIn @action="googleSignIn"/>
-            <div class="footer-form d-flex justify-content-between align-items-center">
+            <div class="footer-form d-flex justify-content-between align-items-lg-center flex-column flex-lg-row">
               <router-link to="/forgot-password">
                       Forgot password?
               </router-link>
@@ -51,10 +50,18 @@
 import SubmitButton from '@/components/Buttons/SubmitButton.vue';
 import OrSeparator from '@/components/OrSeparator.vue';
 import GoogleSignIn from '@/components/Buttons/GoogleSignIn.vue';
+import { Toast } from "@/components/Toast";
 import { ref } from "vue";
 import router from "@/router";
 import { auth } from "@/firebase";
-import { signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { 
+    signInWithEmailAndPassword, signOut, 
+    signInWithPopup, GoogleAuthProvider
+} from "firebase/auth";
+import Swal from "sweetalert2";
+import { useStore } from 'vuex'
+
+
 export default {
     components: { SubmitButton, OrSeparator, GoogleSignIn },
     name: 'LoginPage',
@@ -73,37 +80,56 @@ export default {
         }
     },
     setup () {
+        const store = useStore();
         const email = ref('');
         const password = ref('');
         const isLogging = ref(false);
 
         const Login = async () => {
-            isLogging.value = true;
-            try {
-                await signInWithEmailAndPassword(auth, email.value, password.value)
-                .then(() => {
-                    console.log('logged in');
+            if(!email.value || !password.value) {
+                Swal.fire({
+                    icon: 'error',
+                    iconColor: '#4B4949',
+                    title: 'There is empty field',
+                    color: '#1E1E1E',
+                    text: 'You need to fill all fields to login to your account',
+                    confirmButtonColor: '#4B4949',
+                    background: 'linear-gradient(90deg, rgba(212,212,212,1) 0%, rgba(157,152,152,1) 100%)',
+                    confirmButtonText: 'OK I understand',
+                    showConfirmButton: true,
+                    showCancelButton: false,
                 })
-            } catch(err) {
-                    switch(err.code) {
-                        case 'auth/user-not-found':
-                            alert('User not found');
-                            break;
-                        case 'auth/wrong-password':
-                            alert('Wrong password');
-                            break;
-                        default:
-                            alert('Something went wrong');
-                            break;
-                    }
+                return;
+            } else {
+                isLogging.value = true;
+                isLogging.value = true;
+                await store.dispatch('login', {email: email.value, password: password.value})
+                    .then(() => {
+                        isLogging.value = false;
+                    })
+                email.value = '';
+                password.value = '';
             }
+            
+        }
+
+        const googleSignIn = async () => {
+            isLogging.value = true;
+            await store.dispatch('googleLogin')
+                .then(() => {
+                    Toast.fire({
+                        icon: 'success',
+                        text: 'Login succesfull, welcome to whispers!'
+                    })
+                    isLogging.value = false;
+                })
         }
 
         return {
             email,
             password,
             isLogging,
-            Login
+            Login, googleSignIn
         }
     }
 }
