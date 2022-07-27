@@ -73,8 +73,8 @@ export default {
           })
       }
 
-      onMounted(() => {
-        getWhisperId()
+      onMounted(async () => {
+        await getWhisperId()
       })
 
       const openNav = () => {
