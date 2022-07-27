@@ -59,7 +59,6 @@ import Navbar from '@/components/Navbar/Navbar.vue';
 import { useRoute } from 'vue-router';
 import SendButton from '@/components/Buttons/SendButton.vue';
 import Swal from 'sweetalert2';
-import { getDoc, doc } from "firebase/firestore";
 export default {
   components: { Navbar, SendButton },
     name: 'MessagePage',
