@@ -1,6 +1,6 @@
 <template>
   <div class="home-profile ccontainer">
-    <Navbar :isUser="true"/>
+    <Navbar :isUser="true" :msgId="id"/>
     <div class="home-content">
       <div class="wraper">
         <div class="welcome-text mb-5">
@@ -60,6 +60,7 @@ import Navbar from '@/components/Navbar/Navbar.vue';
 import ProfileButton from '@/components/Buttons/ProfileButton.vue';
 import EditButton from '@/components/Buttons/EditButton.vue';
 import { onMounted } from '@vue/runtime-core';
+import { getDoc, doc } from "firebase/firestore";
 
 export default {
   components: { Navbar, ProfileButton, EditButton },
@@ -87,13 +88,14 @@ export default {
       const email = ref(auth.currentUser.email);
       const photoUrl = ref(auth.currentUser.photoURL);
       const isEdited = ref(false)
+      const id = ref('')
 
       const whispersId = localStorage.getItem('whispers_id')
       
       const getWhisperId = async () => {
         await getDoc(doc(db, 'users', whispersId))
           .then(docs => {
-            msgId.value = docs.data().whisp_id
+            id.value = docs.data().whisp_id
           })
       }
 
@@ -107,7 +109,7 @@ export default {
 
       return {
         username, avatar, email, isEdited, 
-        openEdit, photoUrl
+        openEdit, photoUrl, id
       }
     }
 }
