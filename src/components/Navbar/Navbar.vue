@@ -82,7 +82,7 @@ export default {
       return {
         Logout,
         openNav,
-        isOpen, msgId
+        isOpen
       }
     }
 }
