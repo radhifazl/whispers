@@ -20,7 +20,7 @@
           </div>
         </router-link>
 
-        <router-link :to="msgId" class="nav-link">
+        <router-link :to="'/msg/'+msgId" class="nav-link">
           <div class="nav-item">
             <i class='bx-fw bx bxs-chat'></i>
             <span class="text-link">Messages</span>
