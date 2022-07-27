@@ -1,6 +1,6 @@
 <template>
   <div class="messages-page ccontainer">
-    <Navbar :isUser="isLoggedIn ? true : false"/>
+    <Navbar :isUser="isLoggedIn ? true : false" :msgId="id"/>
 
     <div class="messages-wrapper p-4 mx-auto">
       <div class="form-wrapper mb-4">
@@ -59,6 +59,7 @@ import Navbar from '@/components/Navbar/Navbar.vue';
 import { useRoute } from 'vue-router';
 import SendButton from '@/components/Buttons/SendButton.vue';
 import Swal from 'sweetalert2';
+import { getDoc, doc } from "firebase/firestore";
 export default {
   components: { Navbar, SendButton },
     name: 'MessagePage',
@@ -72,6 +73,16 @@ export default {
 
       const messages = ref([])
       const replies = ref([])
+      const id = ref('')
+
+      const whispersId = localStorage.getItem('whispers_id')
+      
+      const getWhisperId = async () => {
+        await getDoc(doc(db, 'users', whispersId))
+          .then(docs => {
+            id.value = docs.data().whisp_id
+          })
+      }
 
       const getMessages = async () => {
         const msgRef = collection(db, 'users', whispCode, 'messages')
@@ -273,6 +284,7 @@ export default {
       }
 
       onMounted(() => {
+        getWhisperId()
         getWhispName()
         getMessages()
         logStatus()
@@ -282,7 +294,7 @@ export default {
         isLoggedIn, whispersOwner, checked,
         message, sendMessage, messages, replies, 
         comment, submitComment, checkReplies,
-        deleteMessage, deleteComment
+        deleteMessage, deleteComment, id
       }
     }
 }
