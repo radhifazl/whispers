@@ -59,6 +59,7 @@ import { ref } from '@vue/reactivity';
 import Navbar from '@/components/Navbar/Navbar.vue';
 import ProfileButton from '@/components/Buttons/ProfileButton.vue';
 import EditButton from '@/components/Buttons/EditButton.vue';
+import { onMounted } from '@vue/runtime-core';
 
 export default {
   components: { Navbar, ProfileButton, EditButton },
@@ -87,9 +88,22 @@ export default {
       const photoUrl = ref(auth.currentUser.photoURL);
       const isEdited = ref(false)
 
+      const whispersId = localStorage.getItem('whispers_id')
+      
+      const getWhisperId = async () => {
+        await getDoc(doc(db, 'users', whispersId))
+          .then(docs => {
+            msgId.value = docs.data().whisp_id
+          })
+      }
+
       const openEdit = () => {
         !isEdited.value ? isEdited.value = true : isEdited.value = false;
       }
+
+      onMounted(async () => {
+        await getWhisperId()
+      })
 
       return {
         username, avatar, email, isEdited, 

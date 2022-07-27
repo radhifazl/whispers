@@ -57,25 +57,15 @@ export default {
       isUser: {
         type: Boolean,
         default: false
+      },
+      msgId: {
+        type: String,
+        default: ''
       }
     },
     setup () {
       const isOpen = ref(false)
       const store = useStore();
-      const msgId = ref('')
-
-      const whispersId = localStorage.getItem('whispers_id')
-      
-      const getWhisperId = async () => {
-        await getDoc(doc(db, 'users', whispersId))
-          .then(docs => {
-            msgId.value = docs.data().whisp_id
-          })
-      }
-
-      onMounted(async () => {
-        await getWhisperId()
-      })
 
       const openNav = () => {
         !isOpen.value ? isOpen.value = true : isOpen.value = false;
