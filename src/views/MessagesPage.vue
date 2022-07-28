@@ -22,23 +22,8 @@
               <div class="message-text">
                 <p>{{message.message}}</p>
               </div>
-              <form id="comment-form" @submit.prevent="submitComment(message.id)">
-                <input type="text" v-model="comment" name="comment" placeholder="Write a comment" class="form-control inp-comment">
-                <button class="btn-comment sbtn" type="submit">Submit</button>
-              </form>
               <div class="check mt-3" @click="checkReplies(message.id)">
-                <i class='bx-fw bx bxs-chevron-right' :class="{checked: checked}"></i> <span v-if="!checked">Check Replies</span> <span v-else>Hide Replies</span>
-              </div>
-              <div class="replies mt-3" v-if="checked">
-                <div class="reply-text mb-2" v-for="(reply, i) in replies" :key="i">
-                  <span>{{reply.comment}}</span>
-                  <div v-if="isLoggedIn" class="delete delete-reply" @click="deleteComment(message.id, reply.id)">
-                    <i class='bx bxs-trash' ></i>
-                  </div>
-                </div>
-                <div class="no-reply" v-if="!replies.length">
-                  <span>No reply</span>
-                </div>
+                <i class='bx-fw bx bxs-chevron-right'></i> <span>Check Replies</span>
               </div>
             </div>
             <div v-if="isLoggedIn" class="delete" @click="deleteMessage(message.id)">
@@ -59,6 +44,7 @@ import Navbar from '@/components/Navbar/Navbar.vue';
 import { useRoute } from 'vue-router';
 import SendButton from '@/components/Buttons/SendButton.vue';
 import Swal from 'sweetalert2';
+import router from '@/router';
 export default {
   components: { Navbar, SendButton },
     name: 'MessagePage',
@@ -67,17 +53,14 @@ export default {
       const whispersOwner = ref('')
       const whispCode = useRoute().params.id
       const message = ref('')
-      const comment = ref('')
-      const checked = ref(false)
 
       const messages = ref([])
-      const replies = ref([])
       const id = ref('')
 
       const whispersId = localStorage.getItem('whispers_id')
       
       const getWhisperId = async () => {
-        await getDoc(doc(db, 'users', whispersId))
+        await getDoc(doc(db, 'users', whispCode))
           .then(docs => {
             id.value = docs.data().whisp_id
           })
@@ -98,22 +81,12 @@ export default {
       }
 
       const checkReplies = async (id) => {
-        if(!checked.value) {
-          checked.value = true
-          const replyRef = collection(db, 'users', whispCode, 'messages', id, 'replies')
-          const q = query(replyRef, orderBy('createdAt', 'asc'))
-          onSnapshot(q, (snapshot) => {
-            replies.value = []
-            snapshot.docs.forEach(doc => {
-              replies.value.push({
-                id: doc.id,
-                ...doc.data()
-              })
-            })
-          })
-        } else {
-          checked.value = false
-        }
+        router.push({
+          name: 'RepliesPage',
+          params: { id: whispCode, msgId: id }
+        })
+
+          // console.log(replies.value)
       }
 
       const getWhispName = async () => {
@@ -203,75 +176,6 @@ export default {
         })
       }
 
-      const deleteComment = (msgId, cmtId) => {
-        Swal.fire({
-          title: 'Are you sure?',
-          text: "You won't be able to revert this!",
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
-          confirmButtonText: 'Yes, delete it!'
-        }).then(async (result) => {
-          if(result.isConfirmed) {
-            try {
-              const docRef = doc(db, 'users', whispCode, 'messages', msgId, 'replies', cmtId)
-              await deleteDoc(docRef)
-                .then(() => {
-                  Swal.fire({
-                    title: 'Deleted!',
-                    text: 'Comment has been deleted',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                  })
-                }).finally(() => {
-                  checkReplies(msgId)
-                })
-            } catch (error) {
-              Swal.fire({
-                title: 'Oops...',
-                text: 'Something went wrong!',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              })
-            }
-          }
-        })
-      }
-
-      const submitComment = async (id) => {
-        if(!comment.value) {
-          Swal.fire({
-            title: 'Oops...',
-            text: 'You need to write a message',
-            icon: 'error',
-            confirmButtonText: 'OK'
-          })
-        } else {
-          try {
-            await addDoc(collection(db, 'users', whispCode, 'messages', id, 'replies'), {
-              comment: comment.value,
-              createdAt: serverTimestamp(),
-            }).then(() => {
-              Swal.fire({
-                title: 'Comment sent!',
-                text: 'Your comment has been sent',
-                icon: 'success',
-                confirmButtonText: 'OK'
-              })
-              comment.value = ''
-            })
-          } catch (error) {
-              Swal.fire({
-                title: 'Oops...',
-                text: 'Something went wrong!',
-                icon: 'error',
-                confirmButtonText: 'OK'
-              })
-          }
-        }
-      }
-
       const logStatus = () => {
         auth.onAuthStateChanged(user => {
           if (user) {
@@ -290,10 +194,9 @@ export default {
       })
 
       return {
-        isLoggedIn, whispersOwner, checked,
-        message, sendMessage, messages, replies, 
-        comment, submitComment, checkReplies,
-        deleteMessage, deleteComment, id
+        isLoggedIn, whispersOwner,
+        message, sendMessage, messages, checkReplies,
+        deleteMessage, id
       }
     }
 }
@@ -358,11 +261,6 @@ export default {
   cursor: pointer;
 }
 
-.delete-reply {
-  top: 55%;
-  transform: translateY(-50%);
-}
-
 .delete i {
   font-size: 1.2rem;
   color: var(--primary-color);
@@ -372,34 +270,6 @@ export default {
   color: #e74040;
 }
 
-#comment-form {
-  width: 100%;
-  height: 40px;
-  position: relative;
-}
-
-.inp-comment {
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  border: 1px solid var(--primary-color);
-  padding: 0.5rem 1rem;
-}
-.btn-comment {
-  position: absolute;
-  right: 1%;
-  top: 50%;
-  transform: translateY(-50%);
-}
-.reply-text {
-  width: 100%;
-  position: relative;
-  background: #92929248;
-  padding: 0.3rem 0.7rem;
-}
-.reply-text span {
-  color: #636363;
-}
 @media screen and (max-width: 868px) {
   .messages-page {
     padding-top: 5rem;

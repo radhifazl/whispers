@@ -1,5 +1,5 @@
 <template>
-  <div class="v-navbar w-100">
+  <div class="v-navbar w-100" :class="{user: isUser}">
       <div class="navbar-logo">
           <router-link to="/home">
             <img src="@/assets/logo.svg" alt="Whispers Logo">
@@ -114,6 +114,10 @@ export default {
 
 @media screen and (max-width: 864px) {
   .v-navbar {
+    display: flex;
+  }
+
+  .v-navbar.user {
     display: block;
   }
 

@@ -48,6 +48,11 @@ const routes = [
     name: 'MessagesPage',
     component: () => import('@/views/MessagesPage.vue')
   },
+  {
+    path: '/:id/:msgId',
+    name: 'RepliesPage',
+    component: () => import('@/views/Replies.vue')
+  },
   //error not found path
   {
     path: '/*',
