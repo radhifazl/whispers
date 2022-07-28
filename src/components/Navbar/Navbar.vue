@@ -20,7 +20,7 @@
           </div>
         </router-link>
 
-        <router-link :to="'/msg/'+msgId" class="nav-link">
+        <router-link :to="'/'+msgId" class="nav-link">
           <div class="nav-item">
             <i class='bx-fw bx bxs-chat'></i>
             <span class="text-link">Messages</span>
@@ -48,8 +48,6 @@ import { ref } from '@vue/reactivity';
 import { useStore } from 'vuex'
 import NavSocial from '../SocialMedia/NavSocial.vue';
 import { Toast } from '../Toast';
-import { doc, getDoc } from 'firebase/firestore';
-import { onMounted } from 'vue';
 export default {
   components: { NavSocial },
     name: 'NavbarComp ',

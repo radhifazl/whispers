@@ -44,7 +44,7 @@ const routes = [
     component: () => import('@/views/HomeProfile.vue')
   },
   {
-    path: '/msg/:id',
+    path: '/:id',
     name: 'MessagesPage',
     component: () => import('@/views/MessagesPage.vue')
   },
