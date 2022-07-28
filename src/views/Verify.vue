@@ -28,7 +28,7 @@ export default {
         auth.languageCode = 'en'
 
         let actionCodeSettings = {
-            url: 'http://localhost:8080/home',
+            url: 'https://whisperss.netlify.app/home',
             handleCodeInApp: false
         }
 
