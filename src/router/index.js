@@ -48,6 +48,11 @@ const routes = [
     name: 'MessagesPage',
     component: () => import('@/views/MessagesPage.vue')
   },
+  //error not found path
+  {
+    path: '/*',
+    component: () => import('@/views/NotFound.vue')
+  }
 ]
 
 const router = createRouter({

@@ -1,0 +1,2 @@
+"use strict";(self["webpackChunkwhispers"]=self["webpackChunkwhispers"]||[]).push([[705],{6705:function(n,e,t){t.r(e),t.d(e,{default:function(){return i}});var r=t(3396);const s={class:"text-center"};function u(n,e,t,u,c,o){return(0,r.wg)(),(0,r.iD)("h1",s," 404 Not Found ")}var c={name:"NotFound"},o=t(89);const a=(0,o.Z)(c,[["render",u]]);var i=a}}]);
+//# sourceMappingURL=705.fbace4df.js.map
