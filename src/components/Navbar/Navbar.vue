@@ -5,7 +5,7 @@
             <img src="@/assets/logo.svg" alt="Whispers Logo">
           </router-link>
 
-          <div class="hamburger-menu" @click="openNav" :class="{open: isOpen}">
+          <div class="hamburger-menu" @click="openNav" :class="{open: isOpen}" v-if="isUser">
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>

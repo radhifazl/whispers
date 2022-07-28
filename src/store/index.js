@@ -79,8 +79,6 @@ export default createStore({
                 
                 await updateProfile(auth.currentUser, {
                     displayName: name
-                }).then(() => {
-                    console.log('Profile updated')
                 })
 
                 const shortId = new ShortUniqueId().randomUUID(10);
@@ -93,8 +91,6 @@ export default createStore({
                     whisp_email: email,
                     whisp_uid: auth.currentUser.uid,
                     whisp_id: whispersId
-                }).then(() => {
-                    console.log('User added')
                 })
             } catch(err) {
                 switch(err.code) {
@@ -135,6 +131,18 @@ export default createStore({
                         text: 'You are now logged in',
                     })
                     router.push('/home')
+                })
+
+                const shortId = new ShortUniqueId().randomUUID(10);
+                localStorage.setItem('whispers_id', shortId)
+
+                const whispersId = localStorage.getItem('whispers_id')
+
+                await setDoc(doc(db, 'users', whispersId), {
+                    whisp_name: auth.currentUser.displayName,
+                    whisp_email: auth.currentUser.email,
+                    whisp_uid: auth.currentUser.uid,
+                    whisp_id: whispersId
                 })
             } catch(error) {
                 switch(error.code) {
