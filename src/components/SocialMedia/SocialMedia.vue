@@ -16,17 +16,17 @@ export default {
             medias: [
                 {
                     name: 'Instagram',
-                    link: 'https://www.instagram.com/',
+                    link: 'https://www.instagram.com/difazl/',
                     icon: 'bx-fw bx bxl-instagram-alt'
                 },
                 {
                     name: 'GitHub',
-                    link: 'https://www.github.com/',
+                    link: 'https://github.com/radhifazl',
                     icon: 'bx-fw bx bxl-github'
                 },
                 {
                     name: 'Twitter',
-                    link: 'https://www.twitter.com/',
+                    link: 'https://twitter.com/radhiffazli',
                     icon: 'bx-fw bx bxl-twitter'
                 },
             ]
