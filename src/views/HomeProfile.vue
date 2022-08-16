@@ -33,14 +33,14 @@
               <label for="name">Change Name</label> <br>
               <div class="action">
                 <input type="text" class="edit-inp edit-name mt-2" id="name" @keyup="checkVal" v-model="editName">
-                <EditButton :val="isNameEmpty"/>
+                <EditButton :val="isNameEmpty" @edit="changeName"/>
               </div>
             </div>
             <div class="change-email change mb-3">
               <label for="email">Change Email</label> <br>
               <div class="action">
                 <input type="text" class="edit-inp edit-email mt-2" id="email" @keyup="checkVal2" v-model="editEmail">
-                <EditButton :val="isEmailEmpty"/>
+                <EditButton :val="isEmailEmpty" @edit="changeEmail"/>
               </div>
             </div>
           </div>
@@ -61,41 +61,99 @@ import ProfileButton from '@/components/Buttons/ProfileButton.vue';
 import EditButton from '@/components/Buttons/EditButton.vue';
 import { onMounted } from '@vue/runtime-core';
 import { getDoc, doc } from "firebase/firestore";
+import Swal from 'sweetalert2';
+import { updateEmail, updateProfile } from 'firebase/auth';
+import { Toast } from '@/components/Toast';
+import { useStore } from 'vuex';
 
 export default {
   components: { Navbar, ProfileButton, EditButton },
     name:'HomeProfile',
-    data () {
-      return {
-        editName: '',
-        editEmail: '',
-        isNameEmpty: false,
-        isEmailEmpty: false,
-        show: true
-      }
-    },
-    methods: {
-      checkVal() {
-        this.editName.length > 0 ? this.isNameEmpty = true : this.isNameEmpty = false;
-      },
-      checkVal2() {
-        this.editEmail.length > 0 ? this.isEmailEmpty = true : this.isEmailEmpty = false;
-      }
-    },
     setup () {
       const avatar = ref('');
       const username = ref(auth.currentUser.displayName);
       const email = ref(auth.currentUser.email);
       const photoUrl = ref(auth.currentUser.photoURL);
       const isEdited = ref(false)
+      const editName = ref('')
+      const editEmail = ref('')
+      const isNameEmpty = ref(false)
+      const isEmailEmpty = ref(false)
+      const store = useStore()
       const id = ref('')
 
-      const whispersId = localStorage.getItem('whispers_id')
-      
+      const checkVal = () => {
+        editName.value.length > 0 ? isNameEmpty.value = true : isNameEmpty.value = false
+      }
+
+      const checkVal2 = () => {
+        editEmail.value.length > 0 ? isEmailEmpty.value = true : isEmailEmpty.value = false
+      }
+
+      const changeName = () => {
+        Swal.fire({
+          title: 'Change name?',
+          text: "You will change your name to " + editName.value,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then(async result => {
+          if(result.isConfirmed) {
+            await updateProfile(auth.currentUser, {
+              displayName: editName.value
+            }).then(() => {
+              isNameEmpty.value = false
+              username.value = editName.value
+              Swal.fire(
+                'Changed!',
+                'Your name has been changed.',
+                'success'
+              )
+            }).catch((err) => {
+              console.log(err)
+              Toast.fire({
+                icon: 'error',
+                text: 'Something is wrong, please try again.'
+              })
+            }) 
+          }
+        })
+      }
+
+      const changeEmail = () => {
+        Swal.fire({
+          title: 'Change name?',
+          text: "You will change your email to " + editEmail.value,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, delete it!'
+        }).then(async result => {
+          if(result.isConfirmed) {
+            await updateEmail(auth.currentUser, editEmail.value)
+            .then(() => {
+              Swal.fire(
+                'Changed!',
+                'Your email has been changed.',
+                'success'
+              )
+            }).catch(() => {
+              Toast.fire({
+                icon: 'error',
+                text: 'Something is wrong, please try again.'
+              })
+            }) 
+          }
+        })
+      }
+
       const getWhisperId = async () => {
-        await getDoc(doc(db, 'users', whispersId))
+        await getDoc(doc(db, 'users', auth.currentUser.uid))
           .then(docs => {
-            id.value = docs.data().whisp_id
+            id.value = store.state.id = docs.data().whisp_id
           })
       }
 
@@ -108,8 +166,8 @@ export default {
       })
 
       return {
-        username, avatar, email, isEdited, 
-        openEdit, photoUrl, id
+        username, avatar, email, isEdited, editName, editEmail, isNameEmpty, isEmailEmpty,
+        openEdit, photoUrl, id, checkVal, checkVal2, changeName, changeEmail
       }
     }
 }
@@ -126,7 +184,8 @@ export default {
   padding: 7rem 2rem;
   background: #FFF;
   width: 50%;
-  height: 100vh;
+  min-height: 100vh;
+  height: 100%;
   margin: auto;
   box-shadow: rgba(50, 50, 93, 0.25) 0px 13px 27px -5px, rgba(0, 0, 0, 0.3) 0px 8px 16px -8px;
 }

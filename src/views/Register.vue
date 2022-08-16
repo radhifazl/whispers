@@ -43,8 +43,6 @@
           </form>
           
           <div class="form bottom-form">
-            <OrSeparator/>
-            <GoogleSignIn @action="googleSignIn"/>
             <div class="footer-form">
                 <router-link to="/login">
                     Already have an account? Login here
@@ -57,14 +55,12 @@
 
 <script>
 import SubmitButton from '@/components/Buttons/SubmitButton.vue';
-import OrSeparator from '@/components/OrSeparator.vue';
-import GoogleSignIn from '@/components/Buttons/GoogleSignIn.vue';
 import { ref } from "vue";
 import Swal from 'sweetalert2';
 import { useStore } from 'vuex';
 
 export default {
-    components: { SubmitButton, OrSeparator, GoogleSignIn },
+    components: { SubmitButton },
     name: 'LoginPage',
     methods: {
         showPass() {
@@ -112,12 +108,8 @@ export default {
         }
       }
 
-      const googleSignIn = async () => {
-          await store.dispatch('googleLogin')
-      }
-
       return {
-        register, googleSignIn,
+        register,
         name,
         email, password,
         isRegistering

@@ -6,8 +6,8 @@
           Please verify your account by clicking the link in the email we sent you. <br>
           If the email doesn't arrive in your inbox, check your spam folder.
         </p>
-        <button class="verif-btn" @click="sendVerification">
-            <span v-if="isSended">Verification Sent</span> <span v-else>Send Verification Email</span>
+        <button class="verif-btn" @click="sendVerification" :disabled="isDisabled">
+            <span v-if="isSended">Verification Sent, please wait to send a new verification</span> <span v-else>Send Verification Email</span>
         </button>
       </div>
   </div>
@@ -24,6 +24,7 @@ export default {
     name: 'VerifyPage',
     setup () {
         const isSended = ref(false)
+        const isDisabled = ref(false)
 
         auth.languageCode = 'en'
 
@@ -34,14 +35,18 @@ export default {
 
         const sendVerification = async () => {
             isSended.value = true;
+            isDisabled.value = true
             await sendEmailVerification(auth.currentUser, actionCodeSettings)
                 .then(() => {
-                    isSended.value = false;
+                    setTimeout(() => {
+                        isDisabled.value = false
+                        isSended.value = false;
+                    }, 60000)
                 })
         }
 
         return {
-            isSended,
+            isSended, isDisabled,
             sendVerification
         }
     },
@@ -59,6 +64,11 @@ export default {
     border: none;
     outline: none;
     transition: 0.3s ease-in-out;
+}
+
+.verif-btn:disabled {
+    cursor: not-allowed;
+    background: var(--darker-primary-color);
 }
 .verif-btn span {
     color: #FFFFFF;

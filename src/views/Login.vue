@@ -31,8 +31,6 @@
           </form>
           
           <div class="form bottom-form">
-            <OrSeparator/>
-            <GoogleSignIn @action="googleSignIn"/>
             <div class="footer-form d-flex justify-content-between align-items-lg-center flex-column flex-lg-row">
               <router-link to="/forgot-password">
                       Forgot password?
@@ -48,8 +46,6 @@
 
 <script>
 import SubmitButton from '@/components/Buttons/SubmitButton.vue';
-import OrSeparator from '@/components/OrSeparator.vue';
-import GoogleSignIn from '@/components/Buttons/GoogleSignIn.vue';
 import { Toast } from "@/components/Toast";
 import { ref } from "vue";
 import router from "@/router";
@@ -63,7 +59,7 @@ import { useStore } from 'vuex'
 
 
 export default {
-    components: { SubmitButton, OrSeparator, GoogleSignIn },
+    components: { SubmitButton },
     name: 'LoginPage',
     methods: {
         showPass() {
@@ -113,23 +109,11 @@ export default {
             
         }
 
-        const googleSignIn = async () => {
-            isLogging.value = true;
-            await store.dispatch('googleLogin')
-                .then(() => {
-                    Toast.fire({
-                        icon: 'success',
-                        text: 'Login succesfull, welcome to whispers!'
-                    })
-                    isLogging.value = false;
-                })
-        }
-
         return {
             email,
             password,
             isLogging,
-            Login, googleSignIn
+            Login,
         }
     }
 }

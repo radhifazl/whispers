@@ -75,14 +75,14 @@ export default {
         }
 
         const getMessage = async () => {
-            await getDoc(doc(db, 'users', whisp_id, 'messages', message_id))
+            await getDoc(doc(db, 'whispers', 'messages', whisp_id, message_id))
                 .then(docs => {
                     message.value = docs.data().message
                 })
         }
         
         const getReplies = async () => {
-          const replyRef = collection(db, 'users', whisp_id, 'messages', message_id, 'replies')
+          const replyRef = collection(db, 'whispers', 'messages', whisp_id, message_id, 'replies')
           const q = query(replyRef, orderBy('createdAt', 'asc'))
           onSnapshot(q, (snapshot) => {
             replies.value = []
@@ -105,17 +105,17 @@ export default {
             })
             } else {
             try {
-                await addDoc(collection(db, 'users', whisp_id, 'messages', message_id, 'replies'), {
-                comment: comment.value,
-                createdAt: serverTimestamp(),
+                await addDoc(collection(db, 'whispers', 'messages', whisp_id, message_id, 'replies'), {
+                    comment: comment.value,
+                    createdAt: serverTimestamp(),
                 }).then(() => {
-                Swal.fire({
-                    title: 'Comment sent!',
-                    text: 'Your comment has been sent',
-                    icon: 'success',
-                    confirmButtonText: 'OK'
-                })
                     comment.value = ''
+                    Swal.fire({
+                        title: 'Comment sent!',
+                        text: 'Your comment has been sent',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    })
                 })
             } catch (error) {
                 Swal.fire({
@@ -140,7 +140,7 @@ export default {
             }).then(async (result) => {
                 if(result.isConfirmed) {
                     try {
-                    const docRef = doc(db, 'users', whisp_id, 'messages', msgId, 'replies', cmtId)
+                    const docRef = doc(db, 'whispers', 'messages', whisp_id, msgId, 'replies', cmtId)
                     await deleteDoc(docRef)
                         .then(() => {
                         Swal.fire({

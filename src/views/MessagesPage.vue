@@ -1,6 +1,6 @@
 <template>
   <div class="messages-page ccontainer">
-    <Navbar :isUser="isLoggedIn ? true : false" :msgId="id"/>
+    <Navbar :isUser="isLoggedIn ? true : false" :msgId="whispCode"/>
 
     <div class="messages-wrapper p-4 mx-auto">
       <div class="form-wrapper mb-4">
@@ -51,48 +51,36 @@ export default {
     setup () {
       const isLoggedIn = ref(false)
       const whispersOwner = ref('')
-      const whispCode = useRoute().params.id
+      const whispCode = ref(useRoute().params.id)
       const message = ref('')
 
       const messages = ref([])
-      const id = ref('')
-
-      const whispersId = localStorage.getItem('whispers_id')
-      
-      const getWhisperId = async () => {
-        await getDoc(doc(db, 'users', whispCode))
-          .then(docs => {
-            id.value = docs.data().whisp_id
-          })
-      }
 
       const getMessages = async () => {
-        const msgRef = collection(db, 'users', whispCode, 'messages')
+        const msgRef = collection(db, 'whispers', 'messages', whispCode.value)
         const q = query(msgRef, orderBy('createdAt', 'asc'))
         onSnapshot(q, (snapshot) => {
-          messages.value = []
-          snapshot.docs.forEach(doc => {
-            messages.value.push({
-              id: doc.id,
-              ...doc.data()
+            messages.value = []
+            snapshot.docs.forEach(doc => {
+              messages.value.push({
+                id: doc.id,
+                ...doc.data()
+              })
             })
-          })
         })
       }
 
       const checkReplies = async (id) => {
         router.push({
           name: 'RepliesPage',
-          params: { id: whispCode, msgId: id }
+          params: { id: whispCode.value, msgId: id }
         })
-
-          // console.log(replies.value)
       }
 
       const getWhispName = async () => {
-        await getDoc(doc(db, 'users', whispCode))
+        await getDoc(doc(db, 'usernames', whispCode.value))
           .then(docs => {
-            whispersOwner.value = docs.data().whisp_name
+            whispersOwner.value = docs.data().name
           })
       }
 
@@ -116,17 +104,11 @@ export default {
           })
         } else {
           try {
-            await addDoc(collection(db, 'users', whispCode, 'messages'), {
+            await addDoc(collection(db, 'whispers', 'messages', whispCode.value), {
               message: message.value,
               createdAt: serverTimestamp(),
               date: getDate(new Date())
             }).then(() => {
-              Swal.fire({
-                title: 'Message sent!',
-                text: 'Your message has been sent',
-                icon: 'success',
-                confirmButtonText: 'OK'
-              })
               message.value = ''
             })
           } catch (error) {
@@ -152,7 +134,7 @@ export default {
         }).then(async (result) => {
           if(result.isConfirmed) {
             try {
-              const docRef = doc(db, 'users', whispCode, 'messages', id)
+              const docRef = doc(db, 'whispers', 'messages', whispCode.value, id)
               await deleteDoc(docRef)
                 .then(() => {
                   Swal.fire({
@@ -187,7 +169,6 @@ export default {
       }
 
       onMounted(() => {
-        getWhisperId()
         getWhispName()
         getMessages()
         logStatus()
@@ -196,7 +177,7 @@ export default {
       return {
         isLoggedIn, whispersOwner,
         message, sendMessage, messages, checkReplies,
-        deleteMessage, id
+        deleteMessage, whispCode
       }
     }
 }
