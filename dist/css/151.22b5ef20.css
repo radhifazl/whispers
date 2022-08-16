@@ -1,0 +1,1 @@
+.verify-page{background:var(--bg-color)}.verif-btn{background:var(--primary-color);padding:.5rem 1rem;color:#fff;border:none;outline:none;transition:.3s ease-in-out}.verif-btn:disabled{cursor:not-allowed;background:var(--darker-primary-color)}.verif-btn span{color:#fff}.verif-btn:hover{background:var(--darker-primary-color)}

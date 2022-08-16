@@ -1,0 +1,1 @@
+.submit-btn{width:100%;background:var(--primary-color);padding:.5rem 0;color:#fff;border:none;outline:none;transition:.3s ease-in-out}.submit-btn span{color:#fff}.submit-btn:hover{background:var(--darker-primary-color)}.login-container{background:var(--bg-color)}.pass{position:relative}.pass i{position:absolute;bottom:30%;right:2%;font-size:1.3rem;cursor:pointer;height:55%}
